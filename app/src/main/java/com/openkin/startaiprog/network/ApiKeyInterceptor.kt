@@ -3,6 +3,8 @@ package com.openkin.startaiprog.network
 import com.openkin.startaiprog.utils.IAppLogger
 import okhttp3.Interceptor
 import okhttp3.Response
+import com.openkin.startaiprog.utils.CONTENT_TYPE_JSON
+import com.openkin.startaiprog.utils.CONTENT_TYPE
 
 class ApiKeyInterceptor(
     private val apiKey: String,
@@ -15,14 +17,14 @@ class ApiKeyInterceptor(
             chain.proceed(
                 chain.request().newBuilder()
                     .addHeader("x-goog-api-key", apiKey)
-                    .addHeader("Content-Type", "application/json")
+                    .addHeader(CONTENT_TYPE, CONTENT_TYPE_JSON)
                     .addHeader("Api-Revision", "2026-05-20")
                     .build()
             )
         } else {
             chain.proceed(
                 chain.request().newBuilder()
-                    .addHeader("Content-Type", "application/json")
+                    .addHeader(CONTENT_TYPE, CONTENT_TYPE_JSON)
                     .build()
             )
         }

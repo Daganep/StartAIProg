@@ -1,8 +1,10 @@
 package com.openkin.startaiprog.network
 
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
-import com.openkin.startaiprog.network.model.InteractionResponse
-import com.openkin.startaiprog.network.model.RequestPromt
+import com.openkin.startaiprog.network.model.generatetext.TextGenerateRequest
+import com.openkin.startaiprog.network.model.generatetext.TextGenerateResponse
+import com.openkin.startaiprog.network.model.simplerequest.InteractionResponse
+import com.openkin.startaiprog.network.model.simplerequest.RequestPromt
 import com.skydoves.retrofit.adapters.result.ResultCallAdapterFactory
 import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
@@ -17,8 +19,12 @@ import retrofit2.http.POST
 interface GeminiApi {
 
     @POST("v1beta/interactions")
-    suspend fun getKekPek(@Body body: RequestPromt) : Result<InteractionResponse>
+    suspend fun simpleRequest(@Body body: RequestPromt) : Result<InteractionResponse>
+
+    @POST("/v1beta/models/gemini-3.5-flash:generateContent")
+    suspend fun generateText(@Body body: TextGenerateRequest) : Result<TextGenerateResponse>
 }
+
 
 fun GeminiApi(
     baseUrl: String,
@@ -37,9 +43,10 @@ fun GeminiApi(
             )
         )
 
+    val jsonFactory = Json { ignoreUnknownKeys = true }
     return Retrofit.Builder()
         .baseUrl(baseUrl)
-        .addConverterFactory(Json.asConverterFactory(CONTENT_TYPE_JSON.toMediaType()))
+        .addConverterFactory(jsonFactory.asConverterFactory(CONTENT_TYPE_JSON.toMediaType()))
         .addCallAdapterFactory(ResultCallAdapterFactory.create())
         .client(okHttpClient.build())
         .build()

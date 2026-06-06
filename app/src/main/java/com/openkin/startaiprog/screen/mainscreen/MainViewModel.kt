@@ -1,4 +1,4 @@
-package com.openkin.startaiprog
+package com.openkin.startaiprog.screen.mainscreen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

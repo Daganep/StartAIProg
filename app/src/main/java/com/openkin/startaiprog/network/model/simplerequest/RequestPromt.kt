@@ -1,4 +1,4 @@
-package com.openkin.startaiprog.network.model
+package com.openkin.startaiprog.network.model.simplerequest
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

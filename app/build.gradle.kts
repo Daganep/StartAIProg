@@ -12,7 +12,7 @@ android {
     defaultConfig {
         applicationId = "com.openkin.startaiprog"
         minSdk = 28
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
@@ -76,6 +76,9 @@ dependencies {
     implementation(libs.retrofit2.kotlinx.serialization.converter)
     implementation(libs.retrofit.adapters.result)
     api(libs.okhttp)
+
+    //data store
+    implementation(libs.datastore.preferences)
 
     // debug
     debugImplementation(libs.androidx.ui.tooling)

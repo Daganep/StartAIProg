@@ -1,4 +1,4 @@
-package com.openkin.startaiprog.network.model
+package com.openkin.startaiprog.network.model.simplerequest
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -20,8 +20,8 @@ data class InteractionResponse(
 @Serializable
 data class Step(
     val type: String,
-    val content: List<Content?> = listOf(),
-    val signature: String?,
+    val content: List<Content> = listOf(),
+    val signature: String = "",
 )
 
 @Serializable
