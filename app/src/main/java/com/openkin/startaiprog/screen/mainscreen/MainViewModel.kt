@@ -14,14 +14,29 @@ class MainViewModel(
     private val geminiRepository: IGeminiRepository,
 ) : ViewModel() {
 
-    private val _viewState = MutableStateFlow<String>("")
-    val viewState: StateFlow<String> = _viewState.asStateFlow()
+    private val _viewState = MutableStateFlow<MainViewState>(MainViewState())
+    val viewState: StateFlow<MainViewState> = _viewState.asStateFlow()
 
-    fun askGemini(question: String) {
+    fun updatePromt(newPromt: String) {
+        _viewState.update { it.copy(promt = newPromt) }
+    }
+
+    fun changeTab() {
+        _viewState.update { it.copy(showPromt = !it.showPromt) }
+    }
+
+    fun askGemini() {
         viewModelScope.launch(Dispatchers.IO) {
-            geminiRepository.askGemini(question)
+            _viewState.update { it.copy(
+                showPromt = false,
+                isLoading = true,
+            ) }
+            geminiRepository.askGemini(_viewState.value.promt)
                 .collect { answer ->
-                    _viewState.update { answer }
+                    _viewState.update { it.copy(
+                        response = answer,
+                        isLoading = false,
+                    ) }
                 }
         }
     }

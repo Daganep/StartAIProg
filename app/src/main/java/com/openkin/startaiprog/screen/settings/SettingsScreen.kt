@@ -50,7 +50,7 @@ fun SettingsScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 16.dp),
+            .padding(all = 16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Column(
@@ -340,9 +340,7 @@ fun SettingsScreen(
             }
         }
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 8.dp),
+            modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Button(
