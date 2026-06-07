@@ -3,19 +3,20 @@ package com.openkin.startaiprog.repository
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
+import com.openkin.startaiprog.datastore.INCLUDE_THOUGHTS
 import com.openkin.startaiprog.datastore.IS_STOP_SEQUENCES_ENABLED
 import com.openkin.startaiprog.datastore.MAX_OUTPUT_TOKENS
 import com.openkin.startaiprog.datastore.STOP_SEQUENCES
 import com.openkin.startaiprog.datastore.TEMPERATURE
+import com.openkin.startaiprog.datastore.THINKING_LEVEL
 import com.openkin.startaiprog.datastore.TOP_P
 import com.openkin.startaiprog.network.GeminiApi
-import com.openkin.startaiprog.network.model.generatetext.GenerationConfig
-import com.openkin.startaiprog.network.model.generatetext.Part
-import com.openkin.startaiprog.network.model.generatetext.Parts
-import com.openkin.startaiprog.network.model.generatetext.TextGenerateRequest
+import com.openkin.startaiprog.network.model.generatetext.*
 import com.openkin.startaiprog.screen.mainscreen.model.ResponseUI
+import com.openkin.startaiprog.screen.mainscreen.model.ThinkingLevel
 import com.openkin.startaiprog.screen.settings.SettingsViewState
 import com.openkin.startaiprog.utils.EMPTY_STRING
+import com.openkin.startaiprog.utils.GEMINI_FLASH_DEFAULT_INCLUDE_THOUGHTS
 import com.openkin.startaiprog.utils.GEMINI_FLASH_DEFAULT_IS_STOP_SEQ_ON
 import com.openkin.startaiprog.utils.GEMINI_FLASH_DEFAULT_MAX_TOKENS
 import com.openkin.startaiprog.utils.GEMINI_FLASH_DEFAULT_TEMPERATURE
@@ -32,25 +33,6 @@ class GeminiRepository(
     private val settingsDataStore: DataStore<Preferences>,
 ) : IGeminiRepository {
 
-//    override suspend fun askGemini(question: String) : Flow<String> {
-//        val response = geminiApi.simpleRequest(
-//            RequestPromt(model = MODEL_GEMINI_FLASH, input = question)
-//        )
-//        val result = if (response.isSuccess) {
-//            response.getOrNull()
-//                ?.steps
-//                ?.firstOrNull { it.type == "model_output" }
-//                ?.content
-//                ?.get(0)
-//                ?.text
-//                ?: "empty"
-//        } else {
-//            Log.e("MyFilter", "Ошибка из-за: ${response.exceptionOrNull()?.stackTraceToString()}")
-//            "ERROR REQUEST блин"
-//        }
-//        return flowOf(result)
-//    }
-
     @OptIn(ExperimentalCoroutinesApi::class)
     override suspend fun askGemini(question: String) : Flow<ResponseUI> {
         return loadSettings().flatMapLatest  { settings ->
@@ -66,6 +48,10 @@ class GeminiRepository(
                     temperature = settings.temperature,
                     topP = settings.topP,
                     stopSequences = listOf(stopSequences),
+                    thinkingConfig = ThinkingConfig(
+                        includeThoughts = settings.includeThoughts,
+                        thinkingLevel = settings.thinkingLevel.name.lowercase(),
+                    ),
                 )
             )
             val response = geminiApi.generateText(requestBody)
@@ -86,12 +72,17 @@ class GeminiRepository(
 
     override fun loadSettings(): Flow<SettingsViewState> {
         return settingsDataStore.data.map { preferences ->
+            val thinkingLevel = ThinkingLevel.entries.firstOrNull() {
+                it.name.lowercase() == preferences[THINKING_LEVEL]
+            }
             SettingsViewState(
                 maxOutputTokens = preferences[MAX_OUTPUT_TOKENS] ?: GEMINI_FLASH_DEFAULT_MAX_TOKENS,
                 temperature = preferences[TEMPERATURE] ?: GEMINI_FLASH_DEFAULT_TEMPERATURE,
                 topP = preferences[TOP_P] ?: GEMINI_FLASH_DEFAULT_TOP_P,
                 isStopSequencesEnabled = preferences[IS_STOP_SEQUENCES_ENABLED] ?: GEMINI_FLASH_DEFAULT_IS_STOP_SEQ_ON,
-                stopSequences = preferences[STOP_SEQUENCES] ?: EMPTY_STRING
+                stopSequences = preferences[STOP_SEQUENCES] ?: EMPTY_STRING,
+                includeThoughts = preferences[INCLUDE_THOUGHTS] ?: GEMINI_FLASH_DEFAULT_INCLUDE_THOUGHTS,
+                thinkingLevel = thinkingLevel ?: ThinkingLevel.MEDIUM,
             )
         }
     }
@@ -103,6 +94,8 @@ class GeminiRepository(
             state[TOP_P] = storedSettings.topP
             state[IS_STOP_SEQUENCES_ENABLED] = storedSettings.isStopSequencesEnabled
             state[STOP_SEQUENCES] = storedSettings.stopSequences
+            state[INCLUDE_THOUGHTS] = storedSettings.includeThoughts
+            state[THINKING_LEVEL] = storedSettings.thinkingLevel.name.lowercase()
         }
     }
 }

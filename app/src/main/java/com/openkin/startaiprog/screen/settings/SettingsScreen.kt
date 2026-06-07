@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import com.openkin.startaiprog.R
 import com.openkin.startaiprog.screen.widgets.ApplySettingsButton
 import com.openkin.startaiprog.screen.widgets.ItemSettingsCheckbox
+import com.openkin.startaiprog.screen.widgets.ItemSettingsExpand
 import com.openkin.startaiprog.screen.widgets.ItemSettingsParam
 import com.openkin.startaiprog.screen.widgets.ItemSettingsTextParam
 import com.openkin.startaiprog.screen.widgets.SquareButton
@@ -115,8 +116,8 @@ fun SettingsScreen(
 
             // StopSequences
             ItemSettingsCheckbox(
-                paramName = "Использовать параметр",
-                paramDescription = "StopSequences:",
+                paramName = "Использовать параметр StopSequences",
+                paramDescription = EMPTY_STRING,
                 checkedState = state.isStopSequencesEnabled,
                 onCheckedChange = viewModel::updateStopSequencesFlag,
             )
@@ -125,6 +126,22 @@ fun SettingsScreen(
                 isEnabled = state.isStopSequencesEnabled,
                 stateValue = state.stopSequences,
                 onValueChanged = viewModel::updateStopSequences,
+            )
+
+            // Include thoughts
+            ItemSettingsCheckbox(
+                paramName = "Использовать рассуждения",
+                paramDescription = "если включить, попадут в ответ",
+                checkedState = state.includeThoughts,
+                onCheckedChange = viewModel::updateIncludeThoughtsFlag,
+            )
+
+            // Thinking level
+            ItemSettingsExpand(
+                paramName = "Уровень мышления",
+                paramDescription = EMPTY_STRING,
+                stateValue = state.thinkingLevel,
+                onValueChanged = viewModel::updateThinkingLevel,
             )
         }
         Row(
