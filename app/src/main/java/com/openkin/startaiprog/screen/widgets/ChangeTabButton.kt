@@ -39,7 +39,7 @@ fun ChangeTabButton(
             painter = painterResource(id = R.drawable.image_go_back_arrow),
             contentDescription = "Переключиться на другую вкладку",
             modifier = Modifier
-                .size(42.dp)
+                .size(36.dp)
                 .align(Alignment.CenterVertically)
                 .graphicsLayer { scaleX = if (!leftToRight) 1F else -1F },
         )

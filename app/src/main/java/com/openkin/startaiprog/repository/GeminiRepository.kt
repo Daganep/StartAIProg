@@ -1,6 +1,5 @@
 package com.openkin.startaiprog.repository
 
-import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -14,6 +13,7 @@ import com.openkin.startaiprog.network.model.generatetext.GenerationConfig
 import com.openkin.startaiprog.network.model.generatetext.Part
 import com.openkin.startaiprog.network.model.generatetext.Parts
 import com.openkin.startaiprog.network.model.generatetext.TextGenerateRequest
+import com.openkin.startaiprog.screen.mainscreen.model.ResponseUI
 import com.openkin.startaiprog.screen.settings.SettingsViewState
 import com.openkin.startaiprog.utils.EMPTY_STRING
 import com.openkin.startaiprog.utils.GEMINI_FLASH_DEFAULT_IS_STOP_SEQ_ON
@@ -21,6 +21,7 @@ import com.openkin.startaiprog.utils.GEMINI_FLASH_DEFAULT_MAX_TOKENS
 import com.openkin.startaiprog.utils.GEMINI_FLASH_DEFAULT_TEMPERATURE
 import com.openkin.startaiprog.utils.GEMINI_FLASH_DEFAULT_TOP_P
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
@@ -51,7 +52,7 @@ class GeminiRepository(
 //    }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    override suspend fun askGemini(question: String) : Flow<String> {
+    override suspend fun askGemini(question: String) : Flow<ResponseUI> {
         return loadSettings().flatMapLatest  { settings ->
             val stopSequences = if (settings.isStopSequencesEnabled) {
                 settings.stopSequences
@@ -68,17 +69,18 @@ class GeminiRepository(
                 )
             )
             val response = geminiApi.generateText(requestBody)
+            var isError = false
             val result = if (response.isSuccess) {
                 response.getOrNull()
                     ?.candidates?.get(0)
                     ?.content
                     ?.parts?.get(0)
-                    ?.text ?: "Empty"
+                    ?.text ?: EMPTY_STRING
             } else {
-                Log.e("MyFilter", "Ошибка из-за: ${response.exceptionOrNull()?.stackTraceToString()}")
-                "ERROR REQUEST блин"
+                isError = true
+                "ERROR REQUEST: ${response.exceptionOrNull()?.stackTraceToString()}"
             }
-            flowOf(result)
+            flowOf(ResponseUI(message = result, isError = isError))
         }
     }
 

@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
@@ -35,11 +36,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.openkin.startaiprog.R
 import com.openkin.startaiprog.screen.widgets.ChangeTabButton
+import com.openkin.startaiprog.screen.widgets.ClearButton
 import com.openkin.startaiprog.screen.widgets.SquareButton
 import org.koin.androidx.compose.koinViewModel
 
@@ -60,63 +63,6 @@ fun MainScreen(
             .fillMaxWidth()
             .padding(top = 8.dp),
     ) {
-//        Card(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .weight(1F),
-//            shape = RoundedCornerShape(10.dp),
-//            colors = CardDefaults.cardColors(containerColor = Color.White),
-//            elevation = CardDefaults.cardElevation(5.dp),
-//        ) {
-//            Box(modifier = Modifier) {
-//                TextField(
-//                    modifier = Modifier
-//                        .fillMaxSize()
-//                        .padding(end = 32.dp)
-//                        .background(color = Color.White),
-//                    value = state.promt,
-//                    onValueChange = { newText -> viewModel.updatePromt(newText) },
-//                    placeholder = { Text(text = "") },
-//                    textStyle = LocalTextStyle.current
-//                        .copy(
-//                            textAlign = TextAlign.Justify,
-//                            color = Color.Black,
-//                        ),
-//                    colors = TextFieldDefaults.colors(
-//                        focusedContainerColor = Color.White,
-//                        unfocusedContainerColor = Color.White,
-//                        focusedIndicatorColor = Color.Transparent,
-//                        unfocusedIndicatorColor = Color.Transparent,
-//                        focusedPlaceholderColor = Color.Gray,
-//                        unfocusedPlaceholderColor = Color.Gray,
-//                        focusedTrailingIconColor = Color.Transparent,
-//                        unfocusedTrailingIconColor = Color.Transparent,
-//                    ),
-//                )
-//            }
-//        }
-//        Card(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .weight(1F)
-//                .padding(top = 16.dp, bottom = 16.dp),
-//            shape = RoundedCornerShape(10.dp),
-//            colors = CardDefaults.cardColors(containerColor = Color.White),
-//            elevation = CardDefaults.cardElevation(5.dp),
-//        ) {
-//            Box(modifier = Modifier) {
-//                Text(
-//                    text = state.response,
-//                    color = Color.Black,
-//                    modifier = Modifier
-//                        .padding(all = 16.dp)
-//                        .fillMaxSize()
-//                        .verticalScroll(rememberScrollState()),
-//                )
-//            }
-//        }
-
-
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -146,7 +92,7 @@ fun MainScreen(
                             onValueChange = { newText -> viewModel.updatePromt(newText) },
                             textStyle = LocalTextStyle.current
                                 .copy(
-                                    textAlign = TextAlign.Justify,
+                                    textAlign = TextAlign.Left,
                                     color = Color.Black,
                                 ),
                             colors = TextFieldDefaults.colors(
@@ -167,6 +113,12 @@ fun MainScreen(
                                 modifier = Modifier
                                     .padding(end = 8.dp)
                                     .align(Alignment.CenterEnd),
+                            )
+                        }
+                        if (state.promt.isNotEmpty()) {
+                            ClearButton(
+                                onClick = viewModel::updatePromt,
+                                modifier = Modifier.align(Alignment.TopEnd),
                             )
                         }
                     }
@@ -202,14 +154,24 @@ fun MainScreen(
                         contentAlignment = Alignment.Center,
                     ) {
                         if (!state.isLoading) {
-                            Text(
-                                text = state.response,
-                                color = Color.Black,
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(8.dp)
-                                    .verticalScroll(rememberScrollState()),
-                            )
+                            if (!state.isError) {
+                                SelectionContainer {
+                                    Text(
+                                        text = state.response,
+                                        color = Color.Black,
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .padding(12.dp)
+                                            .verticalScroll(rememberScrollState()),
+                                    )
+                                }
+                            } else {
+                                Text(
+                                    text = state.response,
+                                    color = Color.Red,
+                                    fontWeight = FontWeight.Bold,
+                                )
+                            }
                             ChangeTabButton(
                                 onClick = viewModel::changeTab,
                                 leftToRight = false,

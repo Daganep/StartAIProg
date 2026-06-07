@@ -3,6 +3,7 @@ package com.openkin.startaiprog.screen.mainscreen
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.openkin.startaiprog.repository.IGeminiRepository
+import com.openkin.startaiprog.utils.EMPTY_STRING
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -28,15 +29,18 @@ class MainViewModel(
     fun askGemini() {
         viewModelScope.launch(Dispatchers.IO) {
             _viewState.update { it.copy(
+                response = EMPTY_STRING,
                 showPromt = false,
                 isLoading = true,
+                isError = false,
             ) }
             geminiRepository.askGemini(_viewState.value.promt)
                 .collect { answer ->
                     _viewState.update { it.copy(
-                        response = answer,
+                        response = answer.message,
                         isLoading = false,
-                    ) }
+                        isError = answer.isError,
+                    )}
                 }
         }
     }

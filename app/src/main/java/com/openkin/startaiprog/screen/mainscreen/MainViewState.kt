@@ -7,4 +7,5 @@ data class MainViewState(
     val response: String = EMPTY_STRING,
     val showPromt: Boolean = true,
     val isLoading: Boolean = false,
+    val isError: Boolean = false,
 )
