@@ -25,6 +25,7 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.openkin.startaiprog.screen.mainscreen.MainScreen
 import com.openkin.startaiprog.screen.settings.SettingsScreen
+import com.openkin.startaiprog.ui.theme.extraLightGray
 
 @Composable
 fun Navigation(scaffoldContentPaddings: PaddingValues) {
@@ -33,7 +34,7 @@ fun Navigation(scaffoldContentPaddings: PaddingValues) {
 
     Column(
         modifier = Modifier
-            .background(Color.Gray)
+            .background(color = extraLightGray)
             .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {

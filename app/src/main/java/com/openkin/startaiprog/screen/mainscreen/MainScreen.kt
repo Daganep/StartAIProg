@@ -79,7 +79,7 @@ fun MainScreen(
             )
             SquareButton(
                 openSettings = openSettings,
-                icon = R.drawable.settings,
+                icon = R.drawable.settings_white,
                 modifier = Modifier
                     .padding(start = 8.dp)
                     .height(48.dp)

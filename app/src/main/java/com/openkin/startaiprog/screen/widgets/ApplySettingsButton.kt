@@ -14,13 +14,12 @@ import androidx.compose.ui.unit.sp
 import com.openkin.startaiprog.ui.theme.blue
 
 @Composable
-fun SendRequestButton(
-    text: String,
-    onClick: () -> Unit,
+fun ApplySettingsButton(
+    onSaveSettings: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Button(
-        onClick = onClick,
+        onClick = onSaveSettings,
         shape = RoundedCornerShape(5.dp),
         modifier = modifier.height(48.dp),
         colors = ButtonColors(
@@ -31,7 +30,7 @@ fun SendRequestButton(
         ),
     ) {
         Text(
-            text = text,
+            text = "Применить",
             fontSize = 16.sp,
             maxLines = 1,
         )

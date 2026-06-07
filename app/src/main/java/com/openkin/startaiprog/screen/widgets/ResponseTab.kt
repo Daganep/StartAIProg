@@ -1,6 +1,5 @@
 package com.openkin.startaiprog.screen.widgets
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -22,11 +21,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.openkin.startaiprog.R
 import com.openkin.startaiprog.screen.mainscreen.MainViewState
+import com.openkin.startaiprog.ui.theme.blue
 
 @Composable
 fun ResponseTab(
@@ -36,7 +34,7 @@ fun ResponseTab(
     modifier: Modifier = Modifier,
 ) {
     Card(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxHeight()
             .fillMaxWidth()
             .padding(horizontal = 16.dp),
@@ -84,22 +82,26 @@ fun ResponseTab(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(32.dp)
-                .background(Color.Blue),
+                .background(color = blue),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Image(
-                painter = painterResource(R.drawable.image_timer_white),
-                contentDescription = "Таймер",
-                modifier = Modifier
-                    .padding(start = 8.dp)
-                    .size(18.dp),
-            )
-            Text(
-                text = timerValue,
-                color = Color.White,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(start = 8.dp)
-            )
+            ResponseTimer(timerValue = timerValue)
+//            Row(verticalAlignment = Alignment.CenterVertically) {
+//                Image(
+//                    painter = painterResource(R.drawable.image_timer_white),
+//                    contentDescription = "Таймер",
+//                    modifier = Modifier
+//                        .padding(start = 8.dp)
+//                        .size(18.dp),
+//                )
+//                Text(
+//                    text = timerValue,
+//                    color = Color.White,
+//                    fontWeight = FontWeight.Bold,
+//                    fontSize = 14.sp,
+//                    modifier = Modifier.padding(start = 8.dp)
+//                )
+//            }
         }
     }
 }
