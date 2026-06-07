@@ -22,7 +22,6 @@ import com.openkin.startaiprog.utils.GEMINI_FLASH_DEFAULT_MAX_TOKENS
 import com.openkin.startaiprog.utils.GEMINI_FLASH_DEFAULT_TEMPERATURE
 import com.openkin.startaiprog.utils.GEMINI_FLASH_DEFAULT_TOP_P
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
@@ -55,18 +54,26 @@ class GeminiRepository(
                 )
             )
             val response = geminiApi.generateText(requestBody)
-            var isError = false
             val result = if (response.isSuccess) {
-                response.getOrNull()
+                val message = response.getOrNull()
                     ?.candidates?.get(0)
                     ?.content
                     ?.parts?.get(0)
                     ?.text ?: EMPTY_STRING
+                val totalTokensCount = response.getOrNull()?.usageMetadata?.totalTokenCount
+                ResponseUI(
+                    message = message,
+                    isError = false,
+                    totalTokensCount = totalTokensCount.toString() ?: EMPTY_STRING,
+                )
             } else {
-                isError = true
-                "ERROR REQUEST: ${response.exceptionOrNull()?.stackTraceToString()}"
+                ResponseUI(
+                    message = "ERROR REQUEST: ${response.exceptionOrNull()?.stackTraceToString()}",
+                    isError = true,
+                    totalTokensCount = EMPTY_STRING,
+                )
             }
-            flowOf(ResponseUI(message = result, isError = isError))
+            flowOf(result)
         }
     }
 

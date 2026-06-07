@@ -45,6 +45,7 @@ class MainViewModel(
                         response = answer.message,
                         isLoading = false,
                         isError = answer.isError,
+                        totalTokens = answer.totalTokensCount,
                     )}
                 }
         }

@@ -3,12 +3,14 @@ package com.openkin.startaiprog.screen.widgets
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
@@ -23,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.openkin.startaiprog.screen.mainscreen.MainViewState
 import com.openkin.startaiprog.ui.theme.blue
 
@@ -82,26 +85,26 @@ fun ResponseTab(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(32.dp)
-                .background(color = blue),
+                .background(color = blue)
+                .padding(vertical = 2.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            ResponseTimer(timerValue = timerValue)
-//            Row(verticalAlignment = Alignment.CenterVertically) {
-//                Image(
-//                    painter = painterResource(R.drawable.image_timer_white),
-//                    contentDescription = "Таймер",
-//                    modifier = Modifier
-//                        .padding(start = 8.dp)
-//                        .size(18.dp),
-//                )
-//                Text(
-//                    text = timerValue,
-//                    color = Color.White,
-//                    fontWeight = FontWeight.Bold,
-//                    fontSize = 14.sp,
-//                    modifier = Modifier.padding(start = 8.dp)
-//                )
-//            }
+            ResponseTimer(timerValue = timerValue, modifier = Modifier.padding(end = 8.dp))
+            if (state.totalTokens.isNotEmpty()) {
+                Spacer(
+                    Modifier
+                        .background(Color.White)
+                        .width(2.dp)
+                        .fillMaxHeight(),
+                )
+                Text(
+                    text = "Total tokens: ${state.totalTokens}",
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(start = 8.dp)
+                )
+            }
         }
     }
 }
