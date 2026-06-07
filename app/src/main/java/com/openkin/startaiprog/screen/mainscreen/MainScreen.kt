@@ -8,7 +8,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -19,6 +21,7 @@ import com.openkin.startaiprog.screen.widgets.SendRequestButton
 import com.openkin.startaiprog.screen.widgets.SquareButton
 import com.openkin.startaiprog.screen.widgets.TabAnimation
 import org.koin.androidx.compose.koinViewModel
+import java.util.Locale
 
 @Composable
 fun MainScreen(openSettings: () -> Unit) {
@@ -50,9 +53,16 @@ fun MainScreen(
                 modifier = Modifier.weight(1F),
             )
             TabAnimation(isTabShown = !state.showPromt) {
+                val formattedTime by remember(state.timerValue) {
+                    derivedStateOf {
+                        val seconds = state.timerValue / 1000f
+                        String.format(Locale.US, "%.2f", seconds)
+                    }
+                }
                 ResponseTab(
                     state = state,
                     onChangeTabClick = viewModel::changeTab,
+                    timerValue = formattedTime,
                 )
             }
         }

@@ -8,4 +8,5 @@ data class MainViewState(
     val showPromt: Boolean = true,
     val isLoading: Boolean = false,
     val isError: Boolean = false,
+    val timerValue: Long = 0L,
 )
