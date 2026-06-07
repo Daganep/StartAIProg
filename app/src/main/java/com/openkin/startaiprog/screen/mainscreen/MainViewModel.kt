@@ -3,6 +3,7 @@ package com.openkin.startaiprog.screen.mainscreen
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.openkin.startaiprog.repository.IGeminiRepository
+import com.openkin.startaiprog.utils.EMPTY_STRING
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,14 +15,32 @@ class MainViewModel(
     private val geminiRepository: IGeminiRepository,
 ) : ViewModel() {
 
-    private val _viewState = MutableStateFlow<String>("")
-    val viewState: StateFlow<String> = _viewState.asStateFlow()
+    private val _viewState = MutableStateFlow<MainViewState>(MainViewState())
+    val viewState: StateFlow<MainViewState> = _viewState.asStateFlow()
 
-    fun askGemini(question: String) {
+    fun updatePromt(newPromt: String) {
+        _viewState.update { it.copy(promt = newPromt) }
+    }
+
+    fun changeTab() {
+        _viewState.update { it.copy(showPromt = !it.showPromt) }
+    }
+
+    fun askGemini() {
         viewModelScope.launch(Dispatchers.IO) {
-            geminiRepository.askGemini(question)
+            _viewState.update { it.copy(
+                response = EMPTY_STRING,
+                showPromt = false,
+                isLoading = true,
+                isError = false,
+            ) }
+            geminiRepository.askGemini(_viewState.value.promt)
                 .collect { answer ->
-                    _viewState.update { answer }
+                    _viewState.update { it.copy(
+                        response = answer.message,
+                        isLoading = false,
+                        isError = answer.isError,
+                    )}
                 }
         }
     }
