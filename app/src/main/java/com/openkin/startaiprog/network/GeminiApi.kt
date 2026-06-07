@@ -15,6 +15,7 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.http.Body
 import retrofit2.http.POST
+import java.util.concurrent.TimeUnit
 
 interface GeminiApi {
 
@@ -42,6 +43,9 @@ fun GeminiApi(
                 logger = logger,
             )
         )
+        .connectTimeout(30, TimeUnit.SECONDS) // Время на установку соединения
+        .readTimeout(120, TimeUnit.SECONDS)   // Время ожидания ответа от API (КРИТИЧНО)
+        .writeTimeout(30, TimeUnit.SECONDS)   // Время на отправку запроса
 
     val jsonFactory = Json { ignoreUnknownKeys = true }
     return Retrofit.Builder()

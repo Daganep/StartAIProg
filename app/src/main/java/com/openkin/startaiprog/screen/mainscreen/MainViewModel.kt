@@ -37,6 +37,7 @@ class MainViewModel(
                 showPromt = false,
                 isLoading = true,
                 isError = false,
+                totalTokens = EMPTY_STRING,
             ) }
             geminiRepository.askGemini(_viewState.value.promt)
                 .collect { answer ->

@@ -64,7 +64,7 @@ class GeminiRepository(
                 ResponseUI(
                     message = message,
                     isError = false,
-                    totalTokensCount = totalTokensCount.toString() ?: EMPTY_STRING,
+                    totalTokensCount = totalTokensCount.toString(),
                 )
             } else {
                 ResponseUI(
