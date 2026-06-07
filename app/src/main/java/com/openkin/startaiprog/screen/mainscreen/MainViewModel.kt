@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.openkin.startaiprog.repository.IGeminiRepository
 import com.openkin.startaiprog.utils.EMPTY_STRING
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,6 +19,7 @@ class MainViewModel(
 
     private val _viewState = MutableStateFlow<MainViewState>(MainViewState())
     val viewState: StateFlow<MainViewState> = _viewState.asStateFlow()
+    private var timer: Job? = null
 
     fun updatePromt(newPromt: String) {
         _viewState.update { it.copy(promt = newPromt) }
@@ -28,6 +31,7 @@ class MainViewModel(
 
     fun askGemini() {
         viewModelScope.launch(Dispatchers.IO) {
+            startTimer()
             _viewState.update { it.copy(
                 response = EMPTY_STRING,
                 showPromt = false,
@@ -36,12 +40,26 @@ class MainViewModel(
             ) }
             geminiRepository.askGemini(_viewState.value.promt)
                 .collect { answer ->
+                    timer?.cancel()
                     _viewState.update { it.copy(
                         response = answer.message,
                         isLoading = false,
                         isError = answer.isError,
+                        totalTokens = answer.totalTokensCount,
                     )}
                 }
+        }
+    }
+
+    private fun startTimer() {
+        timer?.cancel()
+        timer = viewModelScope.launch {
+            val startTime = System.currentTimeMillis()
+            while (true) {
+                val elapsedMs = System.currentTimeMillis() - startTime
+                _viewState.update { it.copy(timerValue = elapsedMs) }
+                delay(30)
+            }
         }
     }
 }

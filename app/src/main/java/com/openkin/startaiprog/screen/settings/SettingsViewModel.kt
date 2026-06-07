@@ -3,6 +3,7 @@ package com.openkin.startaiprog.screen.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.openkin.startaiprog.repository.IGeminiRepository
+import com.openkin.startaiprog.screen.mainscreen.model.ThinkingLevel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -49,5 +50,13 @@ class SettingsViewModel(
 
     fun updateStopSequences(newValue: String) {
         _viewState.update { it.copy(stopSequences = newValue)  }
+    }
+
+    fun updateIncludeThoughtsFlag(newValue: Boolean) {
+        _viewState.update { it.copy(includeThoughts = newValue)  }
+    }
+
+    fun updateThinkingLevel(newValue: ThinkingLevel) {
+        _viewState.update { it.copy(thinkingLevel = newValue)  }
     }
 }

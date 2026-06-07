@@ -33,4 +33,14 @@ data class GenerationConfig(
     val topP: String,
     @SerialName("stopSequences")
     val stopSequences: List<String>,
+    @SerialName("thinkingConfig")
+    val thinkingConfig: ThinkingConfig,
+)
+
+@Serializable
+data class ThinkingConfig(
+    @SerialName("includeThoughts")
+    val includeThoughts: Boolean,
+    @SerialName("thinkingLevel")
+    val thinkingLevel: String,
 )
