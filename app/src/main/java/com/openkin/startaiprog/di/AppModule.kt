@@ -5,7 +5,9 @@ import androidx.datastore.preferences.core.Preferences
 import com.openkin.startaiprog.BuildConfig
 import com.openkin.startaiprog.datastore.SettingsDataStore
 import com.openkin.startaiprog.network.GeminiApi
+import com.openkin.startaiprog.repository.ChatRepository
 import com.openkin.startaiprog.repository.GeminiRepository
+import com.openkin.startaiprog.repository.IChatRepository
 import com.openkin.startaiprog.repository.IGeminiRepository
 import com.openkin.startaiprog.utils.AppLogger
 import com.openkin.startaiprog.utils.IAppLogger
@@ -28,6 +30,8 @@ val appModule = module {
             settingsDataStore = get()
         )
     }
+
+    single<IChatRepository> { ChatRepository() }
 
     single<DataStore<Preferences>>() { androidApplication().SettingsDataStore }
 

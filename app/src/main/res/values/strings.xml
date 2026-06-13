@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Start AI prog</string>
+    <string name="image_description">Какое-то описание</string>
+
+    <string name="navigation_button_chats">Чаты</string>
+    <string name="navigation_button_settings">Настройки</string>
+
+    <string name="promt_placeholder">Введи запрос</string>
 </resources>

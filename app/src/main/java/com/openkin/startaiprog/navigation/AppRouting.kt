@@ -8,6 +8,8 @@ sealed class Screen : NavKey {
     data object Home : Screen()
 
     data object Settings : Screen()
+
+    data class Chat(val chatId: String) : Screen()
 }
 
 class AppRouting : IAppRouting {
@@ -21,6 +23,10 @@ class AppRouting : IAppRouting {
 
     override fun openSettings() {
         backStack.add(Screen.Settings)
+    }
+
+    override fun openChat(chatId: String) {
+        backStack.add(Screen.Chat(chatId))
     }
 
     override fun goBack() {

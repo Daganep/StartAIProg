@@ -31,6 +31,9 @@ retrofit = "2.11.0"
 retrofit2KotlinxSerializationConverter = "1.0.0"
 retrofitAdaptersResult = "1.0.13"
 
+#icons
+material_icons = "1.7.8"
+
 #data store
 dataStore = "1.2.1"
 
@@ -72,6 +75,9 @@ retrofit2-kotlinx-serialization-converter = { module = "com.jakewharton.retrofit
 
 #datastore
 datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "dataStore" }
+
+#Icons
+androidx-icons = { group = "androidx.compose.material", name = "material-icons-extended", version.ref = "material_icons" }
 
 #tests
 junit = { group = "junit", name = "junit", version.ref = "junit" }

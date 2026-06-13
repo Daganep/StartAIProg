@@ -11,6 +11,7 @@ val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 
 val transparent = Color(0x00000000)
+val bottomBarTransparent = Color(0x192FC0FC)
 val halfTransparent = Color(0x07000000)
 val extraLightGray = Color(0xFFE7E5E5)
 val blue = Color(0xFF0785C7)

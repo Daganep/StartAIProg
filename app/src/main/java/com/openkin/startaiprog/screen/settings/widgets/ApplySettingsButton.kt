@@ -1,4 +1,4 @@
-package com.openkin.startaiprog.screen.widgets
+package com.openkin.startaiprog.screen.settings.widgets
 
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape

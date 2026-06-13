@@ -6,5 +6,7 @@ interface IAppRouting {
 
     fun openSettings()
 
+    fun openChat(chatId: String)
+
     fun goBack()
 }

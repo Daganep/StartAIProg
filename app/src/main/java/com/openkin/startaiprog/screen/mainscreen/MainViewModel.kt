@@ -2,8 +2,8 @@ package com.openkin.startaiprog.screen.mainscreen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.openkin.startaiprog.repository.IChatRepository
 import com.openkin.startaiprog.repository.IGeminiRepository
-import com.openkin.startaiprog.utils.EMPTY_STRING
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -15,11 +15,29 @@ import kotlinx.coroutines.launch
 
 class MainViewModel(
     private val geminiRepository: IGeminiRepository,
+    private val chatRepository: IChatRepository,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow<MainViewState>(MainViewState())
     val viewState: StateFlow<MainViewState> = _viewState.asStateFlow()
     private var timer: Job? = null
+
+    init {
+//        val defaultChat = ChatUI(
+//            chatId = 100,
+//            chatName = "Чат без  истории",
+//            messages = listOf(),
+//        )
+//        _viewState.update { it.copy(chatsList = listOf(defaultChat)) }
+    }
+
+    fun loadChats() {
+        viewModelScope.launch(Dispatchers.IO) {
+            chatRepository.loadChat().collect { chat ->
+                _viewState.update { it.copy(chatsList = listOf(chat)) }
+            }
+        }
+    }
 
     fun updatePromt(newPromt: String) {
         _viewState.update { it.copy(promt = newPromt) }
@@ -29,27 +47,31 @@ class MainViewModel(
         _viewState.update { it.copy(showPromt = !it.showPromt) }
     }
 
-    fun askGemini() {
-        viewModelScope.launch(Dispatchers.IO) {
-            startTimer()
-            _viewState.update { it.copy(
-                response = EMPTY_STRING,
-                showPromt = false,
-                isLoading = true,
-                isError = false,
-                totalTokens = EMPTY_STRING,
-            ) }
-            geminiRepository.askGemini(_viewState.value.promt)
-                .collect { answer ->
-                    timer?.cancel()
-                    _viewState.update { it.copy(
-                        response = answer.message,
-                        isLoading = false,
-                        isError = answer.isError,
-                        totalTokens = answer.totalTokensCount,
-                    )}
-                }
-        }
+//    fun askGemini() {
+//        viewModelScope.launch(Dispatchers.IO) {
+//            startTimer()
+//            _viewState.update { it.copy(
+//                response = EMPTY_STRING,
+//                showPromt = false,
+//                isLoading = true,
+//                isError = false,
+//                totalTokens = EMPTY_STRING,
+//            ) }
+//            geminiRepository.askGemini(_viewState.value.promt)
+//                .collect { answer ->
+//                    timer?.cancel()
+//                    _viewState.update { it.copy(
+//                        response = answer.message,
+//                        isLoading = false,
+//                        isError = answer.isError,
+//                        totalTokens = answer.totalTokensCount,
+//                    )}
+//                }
+//        }
+//    }
+
+    fun sendChatToArchive(chatId: String) {
+
     }
 
     private fun startTimer() {

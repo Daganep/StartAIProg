@@ -11,7 +11,13 @@ import com.openkin.startaiprog.datastore.TEMPERATURE
 import com.openkin.startaiprog.datastore.THINKING_LEVEL
 import com.openkin.startaiprog.datastore.TOP_P
 import com.openkin.startaiprog.network.GeminiApi
-import com.openkin.startaiprog.network.model.generatetext.*
+import com.openkin.startaiprog.network.model.generatetext.GenerationConfig
+import com.openkin.startaiprog.network.model.generatetext.Part
+import com.openkin.startaiprog.network.model.generatetext.Parts
+import com.openkin.startaiprog.network.model.generatetext.TextGenerateRequest
+import com.openkin.startaiprog.network.model.generatetext.ThinkingConfig
+import com.openkin.startaiprog.screen.chat.model.ChatMessageUI
+import com.openkin.startaiprog.screen.chat.model.DefaultChat
 import com.openkin.startaiprog.screen.mainscreen.model.ResponseUI
 import com.openkin.startaiprog.screen.mainscreen.model.ThinkingLevel
 import com.openkin.startaiprog.screen.settings.SettingsViewState
@@ -26,6 +32,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import java.util.UUID
 
 class GeminiRepository(
     private val geminiApi: GeminiApi,
@@ -33,7 +40,8 @@ class GeminiRepository(
 ) : IGeminiRepository {
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    override suspend fun askGemini(question: String) : Flow<ResponseUI> {
+    override suspend fun askGemini(chatMessage: ChatMessageUI) : Flow<ResponseUI> {
+        DefaultChat.addMessage(chatMessage)
         return loadSettings().flatMapLatest  { settings ->
             val stopSequences = if (settings.isStopSequencesEnabled) {
                 settings.stopSequences
@@ -41,7 +49,7 @@ class GeminiRepository(
                 EMPTY_STRING
             }
             val requestBody = TextGenerateRequest(
-                contents = listOf(Parts(parts = listOf(Part(text = question)))),
+                contents = listOf(Parts(parts = listOf(Part(text = chatMessage.message)))),
                 generationConfig = GenerationConfig(
                     maxOutputTokens = settings.maxOutputTokens,
                     temperature = settings.temperature,
@@ -53,6 +61,8 @@ class GeminiRepository(
                     ),
                 )
             )
+            val newId = UUID.randomUUID().toString()
+            val currentTimeMS = System.currentTimeMillis()
             val response = geminiApi.generateText(requestBody)
             val result = if (response.isSuccess) {
                 val message = response.getOrNull()
@@ -61,18 +71,52 @@ class GeminiRepository(
                     ?.parts?.get(0)
                     ?.text ?: EMPTY_STRING
                 val totalTokensCount = response.getOrNull()?.usageMetadata?.totalTokenCount
+                val responseChatMessage = ChatMessageUI(newId, message, currentTimeMS, false)
+                DefaultChat.addMessage(responseChatMessage)
                 ResponseUI(
-                    message = message,
+                    message = responseChatMessage,
                     isError = false,
                     totalTokensCount = totalTokensCount.toString(),
                 )
             } else {
+                val message = "ERROR REQUEST: ${response.exceptionOrNull()?.stackTraceToString()}"
+                val errorChatMessage = ChatMessageUI(newId, message, currentTimeMS, false)
+                DefaultChat.addMessage(errorChatMessage)
                 ResponseUI(
-                    message = "ERROR REQUEST: ${response.exceptionOrNull()?.stackTraceToString()}",
+                    message = errorChatMessage,
                     isError = true,
                     totalTokensCount = EMPTY_STRING,
                 )
             }
+//            delay(1500)
+//            val newId = UUID.randomUUID().toString()
+//            val currentTimeMS = System.currentTimeMillis()
+//            val message = "Ответ от Gemini:" +
+//                    "val result = if (response.isSuccess) {\n" +
+//                    "val message = response.getOrNull()\n" +
+//                    "response = geminiApi.generateText(requestBody)\n" +
+//                    "?.content\n" +
+//                    "?.parts?.get(0)\n" +
+//                    "?.candidates?.get(0)\n" +
+//                    "?.text ?: EMPTY_STRING\n" +
+//                    "val totalTokensCount = response.getOrNull()?.usageMetadata?.totalTokenCount\n" +
+//                    "ResponseUI(\n" +
+//                    "message = message,\n" +
+//                    "isError = false,\n" +
+//                    "totalTokensCount = totalTokensCount.toString(),\n" +
+//                    ")\n" +
+//                    "}"
+//            val responseMessage = ChatMessageUI(
+//                messageId = newId,
+//                message = message,
+//                messageTime = currentTimeMS,
+//                outgoing = false,
+//            )
+//            val result = ResponseUI(
+//                message = responseMessage,
+//                isError = false,
+//                totalTokensCount = 1250.toString(),
+//            )
             flowOf(result)
         }
     }

@@ -1,10 +1,9 @@
-package com.openkin.startaiprog.screen.mainscreen
+package com.openkin.startaiprog.screen.chat
 
-import com.openkin.startaiprog.screen.chat.model.ChatUI
+import com.openkin.startaiprog.screen.chat.model.ChatMessageUI
 import com.openkin.startaiprog.utils.EMPTY_STRING
 
-data class MainViewState(
-    val chatsList: List<ChatUI> = listOf(),
+data class ChatViewState(
     val promt: String = EMPTY_STRING,
     val response: String = EMPTY_STRING,
     val showPromt: Boolean = true,
@@ -12,4 +11,5 @@ data class MainViewState(
     val isError: Boolean = false,
     val timerValue: Long = 0L,
     val totalTokens: String = EMPTY_STRING,
+    val messages: List<ChatMessageUI> = listOf(),
 )
