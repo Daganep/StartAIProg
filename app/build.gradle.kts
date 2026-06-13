@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -79,6 +80,17 @@ dependencies {
 
     //data store
     implementation(libs.datastore.preferences)
+
+    // room
+    implementation(libs.androidx.room.runtime)
+    // optional - Kotlin Extensions and Coroutines support for Room
+    implementation(libs.androidx.room.ktx)
+    // If this project uses any Kotlin source, use Kotlin Symbol Processing (KSP)
+    // See Add the KSP plugin to your project
+    ksp(libs.androidx.room.compiler)
+
+    // icons
+    implementation(libs.androidx.icons)
 
     // debug
     debugImplementation(libs.androidx.ui.tooling)
