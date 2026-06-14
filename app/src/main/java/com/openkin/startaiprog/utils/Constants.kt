@@ -7,6 +7,7 @@ const val START_AI_PREFS = "START_AI_PREFS"
 
 const val EMPTY_STRING = ""
 const val SINGLE_LINE = 1
+const val WEIGHT_OF_HALF = 0.5F
 
 const val GEMINI_FLASH_DEFAULT_MAX_TOKENS = "8192"
 const val GEMINI_FLASH_DEFAULT_TEMPERATURE = "1.0"

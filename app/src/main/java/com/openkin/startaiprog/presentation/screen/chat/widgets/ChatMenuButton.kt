@@ -1,0 +1,95 @@
+package com.openkin.startaiprog.presentation.screen.chat.widgets
+
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+
+@Composable
+fun ChatMenuButton(
+    modifier: Modifier,
+    onMenuClick: () -> Unit,
+) {
+//    var isMenuExpanded by remember { mutableStateOf(false) }
+//    var currentSortType by remember { mutableStateOf(SortType.CREATE_DATE) }
+//    Box {
+//        Image(
+//            painter = painterResource(id = R.drawable.image_sort),
+//            contentDescription = stringResource(R.string.notes_board_sort_button),
+//            modifier = modifier
+//                .padding(start = 24.dp)
+//                .size(28.dp)
+//                .clickable(
+//                    interactionSource = null,
+//                    indication = null,
+//                    onClick = { isMenuExpanded = !isMenuExpanded }
+//                ),
+//        )
+//        DropdownMenu(
+//            expanded = isMenuExpanded,
+//            onDismissRequest = { isMenuExpanded = false },
+//            containerColor = white,
+//            modifier = Modifier.padding(0.dp),
+//        ) {
+//            SortType.entries.forEach { sortType ->
+//                val itemColor = if (sortType == currentSortType) {
+//                    extraLightGray
+//                } else {
+//                    white
+//                }
+//                DropdownMenuItem(
+//                    text = {
+//                        Column(
+//                            modifier = Modifier
+//                                .fillMaxWidth()
+//                                .clickable(
+//                                    interactionSource = remember { MutableInteractionSource() },
+//                                    indication = null,
+//                                    onClick = {
+//                                        onSortClick(sortType)
+//                                        currentSortType = sortType
+//                                        isMenuExpanded = false
+//                                    },
+//                                ),
+//                        ) {
+//                            Text(
+//                                text = stringResource(sortType.viewNameId),
+//                                style = MaterialTheme.typography.expandedList,
+//                                modifier = Modifier.padding(horizontal = 8.dp),
+//                            )
+//                        }
+//                    },
+//                    onClick = {},
+//                    contentPadding = PaddingValues(0.dp),
+//                    modifier = Modifier.background(itemColor),
+//                )
+//            }
+//        }
+//    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ChatMenuButtonPreview() {
+    ChatMenuButton(modifier = Modifier, onMenuClick = {})
+}
