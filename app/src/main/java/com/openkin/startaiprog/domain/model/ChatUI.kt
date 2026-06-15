@@ -11,4 +11,5 @@ data class ChatMessageUI(
     val message: String,
     val messageTime: Long,
     val outgoing: Boolean,
+    val tokensCount: Int,
 )

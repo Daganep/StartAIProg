@@ -16,8 +16,9 @@ val viewModelModule = module {
         ChatViewModel(
             geminiRepository = get(),
             chatRepository = get(),
+            settingsRepository = get(),
         )
     }
 
-    viewModel { SettingsViewModel(geminiRepository = get()) }
+    viewModel { SettingsViewModel(settingsRepository = get()) }
 }

@@ -3,6 +3,7 @@ package com.openkin.startaiprog.presentation.screen.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.openkin.startaiprog.domain.IGeminiRepository
+import com.openkin.startaiprog.domain.ISettingsRepository
 import com.openkin.startaiprog.domain.model.ThinkingLevel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,7 +13,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class SettingsViewModel(
-    private val geminiRepository: IGeminiRepository,
+    private val settingsRepository: ISettingsRepository,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow<SettingsViewState>(SettingsViewState())
@@ -20,7 +21,7 @@ class SettingsViewModel(
 
     fun loadSettings() {
         viewModelScope.launch(Dispatchers.IO) {
-            geminiRepository.loadSettings().collect { storedSettings ->
+            settingsRepository.loadSettings().collect { storedSettings ->
                 _viewState.update { storedSettings }
             }
         }
@@ -28,7 +29,7 @@ class SettingsViewModel(
 
     fun saveSettings() {
         viewModelScope.launch(Dispatchers.IO) {
-            geminiRepository.saveSettings(_viewState.value)
+            settingsRepository.saveSettings(_viewState.value)
         }
     }
 

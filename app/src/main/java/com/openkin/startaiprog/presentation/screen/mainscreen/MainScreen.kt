@@ -83,7 +83,7 @@ fun MainScreen(
             onClick = viewModel::addChat,
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(end = 16.dp, bottom = 96.dp),
+                .padding(end = 16.dp, bottom = 104.dp),
         )
     }
     LaunchedEffect(Unit) {

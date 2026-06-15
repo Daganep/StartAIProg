@@ -8,8 +8,4 @@ import kotlinx.coroutines.flow.Flow
 interface IGeminiRepository {
 
     suspend fun askGemini(question: String, chatId: Int)
-
-    fun loadSettings(): Flow<SettingsViewState>
-
-    suspend fun saveSettings(storedSettings: SettingsViewState)
 }

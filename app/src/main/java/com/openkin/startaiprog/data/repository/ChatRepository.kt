@@ -11,15 +11,15 @@ class ChatRepository(
     private val dataBase: ChatsDatabase,
 ) : IChatRepository {
 
-    override suspend fun loadChat(chatId: Int): Flow<List<MessageDbo>> =
+    override suspend fun loadMessages(chatId: Int): Flow<List<MessageDbo>> =
         dataBase.messagesDao.getChatMessages(chatId)
 
     override suspend fun loadChats(): Flow<List<ChatDbo>> {
         return dataBase.chatsDao.getAll()
     }
 
-    override suspend fun getChatName(chatId: Int): Flow<String> {
-        return dataBase.chatsDao.getChatName(chatId)
+    override suspend fun getChat(chatId: Int): Flow<ChatDbo?> {
+        return dataBase.chatsDao.getChat(chatId)
     }
 
     override suspend fun addChat(chatName: String): Flow<List<ChatDbo>> {
@@ -31,6 +31,8 @@ class ChatRepository(
             description = description,
             createDateMS = createDateMS,
             archived = archived,
+            totalTokens = 0,
+            chatSummary = EMPTY_STRING,
         )
         dataBase.chatsDao.insert(newChat)
         return dataBase.chatsDao.getAll()

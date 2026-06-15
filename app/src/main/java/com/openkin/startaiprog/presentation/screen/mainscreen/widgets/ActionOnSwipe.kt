@@ -42,7 +42,7 @@ fun ActionOnSwipe(
             disabledContentColor = transparent,
         ),
         onClick = onClick,
-        modifier = modifier.padding(start = 4.dp),
+        modifier = modifier.padding(horizontal = 4.dp),
     ) {
         Image(
             painter = painterResource(id = drawableId),

@@ -56,8 +56,10 @@ fun Chat(
             .imePadding(),
     ) {
         ChatTopAppBar(
-            chatName = state.chatId,
-            onMenuClick = {},
+            chatState = state,
+            onShowTokenClick = viewModel::updateShowTokenFlag,
+            onBackButtonClick = routing::goBack,
+            modifier = Modifier.padding(top = 16.dp)
         )
         LazyColumn(
             state = lazyListState,
@@ -72,10 +74,11 @@ fun Chat(
             ),
         ) {
             items(items = state.messages, key = { it.messageId }) { item ->
+                val tokensCount = if (state.showTokens) item.tokensCount else 0
                 if (item.outgoing) {
-                    OutgoingMessageUI(message = item.message, Modifier.align(Alignment.End))
+                    OutgoingMessageUI(item.message, tokensCount, Modifier.align(Alignment.End))
                 } else {
-                    IncomingMessageUI(message = item.message)
+                    IncomingMessageUI(message = item.message, tokensCount = tokensCount)
                 }
             }
         }

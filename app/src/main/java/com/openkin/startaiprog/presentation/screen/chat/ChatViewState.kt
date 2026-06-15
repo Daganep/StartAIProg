@@ -14,4 +14,5 @@ data class ChatViewState(
     val timerValue: Long = 0L,
     val totalTokens: String = EMPTY_STRING,
     val messages: List<ChatMessageUI> = listOf(),
+    val showTokens: Boolean = false,
 )

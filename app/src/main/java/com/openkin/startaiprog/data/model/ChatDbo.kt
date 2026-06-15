@@ -11,4 +11,6 @@ data class ChatDbo(
     @ColumnInfo("description") val description: String,
     @ColumnInfo("createDateMS") val createDateMS: Long,
     @ColumnInfo("archived") val archived: Boolean,
+    @ColumnInfo("totalTokens") val totalTokens: Int,
+    @ColumnInfo("chatSummary") val chatSummary: String,
 )

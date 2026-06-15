@@ -15,13 +15,22 @@ interface ChatsDao {
     fun getAll(): Flow<List<ChatDbo>>
 
     @Query("SELECT * FROM table_chats_database WHERE chatId = :chatId")
+    fun getChat(chatId: Int): Flow<ChatDbo?>
+
+    @Query("SELECT * FROM table_chats_database WHERE chatId = :chatId")
     suspend fun getChatWithMessages(chatId: Int): ChatWithMessages?
 
     @Query("SELECT title FROM table_chats_database WHERE chatId = :chatId")
-    suspend fun getChatName(chatId: Int): Flow<String>
+    suspend fun getChatName(chatId: Int): String
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(chat: ChatDbo)
+
+    @Query("UPDATE table_chats_database SET totalTokens = :totalTokens WHERE chatId = :chatId")
+    suspend fun updateTotalTokens(chatId: Int, totalTokens: Int)
+
+    @Query("UPDATE table_chats_database SET chatSummary = :summary WHERE chatId = :chatId")
+    suspend fun updateChatSummary(chatId: Int, summary: String)
 
     @Query("DELETE FROM table_chats_database WHERE chatId = :chatId")
     suspend fun remove(chatId: Int)

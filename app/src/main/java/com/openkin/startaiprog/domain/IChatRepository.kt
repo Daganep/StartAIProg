@@ -6,11 +6,11 @@ import kotlinx.coroutines.flow.Flow
 
 interface IChatRepository {
 
-    suspend fun loadChat(chatId: Int): Flow<List<MessageDbo>>
+    suspend fun loadMessages(chatId: Int): Flow<List<MessageDbo>>
 
     suspend fun loadChats(): Flow<List<ChatDbo>>
 
-    suspend fun getChatName(chatId: Int): Flow<String>
+    suspend fun getChat(chatId: Int): Flow<ChatDbo?>
 
     suspend fun addChat(chatName: String): Flow<List<ChatDbo>>
 
