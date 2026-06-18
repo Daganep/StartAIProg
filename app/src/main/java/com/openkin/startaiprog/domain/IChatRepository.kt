@@ -1,12 +1,12 @@
 package com.openkin.startaiprog.domain
 
 import com.openkin.startaiprog.data.model.ChatDbo
-import com.openkin.startaiprog.data.model.MessageDbo
+import com.openkin.startaiprog.domain.model.MessageDto
 import kotlinx.coroutines.flow.Flow
 
 interface IChatRepository {
 
-    suspend fun loadMessages(chatId: Int): Flow<List<MessageDbo>>
+    suspend fun loadMessages(chatId: Int): Flow<List<MessageDto>>
 
     suspend fun loadChats(): Flow<List<ChatDbo>>
 

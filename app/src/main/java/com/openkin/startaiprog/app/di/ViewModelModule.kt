@@ -15,7 +15,7 @@ val viewModelModule = module {
     viewModel {
         ChatViewModel(
             geminiRepository = get(),
-            chatRepository = get(),
+            chatInteractor = get(),
             settingsRepository = get(),
         )
     }

@@ -2,10 +2,9 @@ package com.openkin.startaiprog.presentation.screen.chat
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.openkin.startaiprog.domain.IChatRepository
+import com.openkin.startaiprog.domain.IChatInteractor
 import com.openkin.startaiprog.domain.IGeminiRepository
 import com.openkin.startaiprog.domain.ISettingsRepository
-import com.openkin.startaiprog.domain.model.ChatMessageUI
 import com.openkin.startaiprog.utils.EMPTY_STRING
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +15,7 @@ import kotlinx.coroutines.launch
 
 class ChatViewModel(
     private val geminiRepository: IGeminiRepository,
-    private val chatRepository: IChatRepository,
+    private val chatInteractor: IChatInteractor,
     private val settingsRepository: ISettingsRepository,
 ) : ViewModel() {
 
@@ -25,26 +24,14 @@ class ChatViewModel(
 
     fun loadChat(chatId: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            chatRepository.loadMessages(chatId).collect  { chat ->
-                val messages = mutableListOf<ChatMessageUI>()
-                chat.forEach { message ->
-                    messages.add(
-                        ChatMessageUI(
-                            messageId = message.messageId,
-                            message = message.message,
-                            messageTime = message.timestamp,
-                            outgoing = message.outgoing,
-                            tokensCount = message.tokensCount,
-                        )
-                    )
-                }
+            chatInteractor.loadMessages(chatId).collect  { chatMessages ->
                 _viewState.update {
-                    it.copy(chatId = chatId, messages = messages)
+                    it.copy(chatId = chatId, messages = chatMessages)
                 }
             }
         }
         viewModelScope.launch {
-            chatRepository.getChat(chatId).collect {
+            chatInteractor.getChat(chatId).collect {
                 it?.let { chat ->
                     _viewState.update { viewState ->
                         viewState.copy(

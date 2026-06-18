@@ -5,11 +5,3 @@ data class ChatUI(
     val chatName: String,
     val messages: List<ChatMessageUI>,
 )
-
-data class ChatMessageUI(
-    val messageId: Int,
-    val message: String,
-    val messageTime: Long,
-    val outgoing: Boolean,
-    val tokensCount: Int,
-)

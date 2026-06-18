@@ -2,7 +2,6 @@ package com.openkin.startaiprog.data.repository
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
 import com.openkin.startaiprog.data.database.ChatsDatabase
 import com.openkin.startaiprog.data.datastore.INCLUDE_THOUGHTS
 import com.openkin.startaiprog.data.datastore.IS_STOP_SEQUENCES_ENABLED
@@ -19,9 +18,7 @@ import com.openkin.startaiprog.data.network.model.generatetext.Parts
 import com.openkin.startaiprog.data.network.model.generatetext.TextGenerateRequest
 import com.openkin.startaiprog.data.network.model.generatetext.ThinkingConfig
 import com.openkin.startaiprog.domain.IGeminiRepository
-import com.openkin.startaiprog.domain.model.ChatMessageUI
-import com.openkin.startaiprog.domain.model.DefaultChat
-import com.openkin.startaiprog.domain.model.ResponseUI
+import com.openkin.startaiprog.domain.model.MessageType
 import com.openkin.startaiprog.domain.model.ThinkingLevel
 import com.openkin.startaiprog.presentation.screen.settings.SettingsViewState
 import com.openkin.startaiprog.utils.EMPTY_STRING
@@ -32,13 +29,9 @@ import com.openkin.startaiprog.utils.GEMINI_FLASH_DEFAULT_TEMPERATURE
 import com.openkin.startaiprog.utils.GEMINI_FLASH_DEFAULT_TOP_P
 import com.openkin.startaiprog.utils.MESSAGES_COUNT_FOR_SUMMARY
 import com.openkin.startaiprog.utils.REQUEST_MAKE_SUMMARY
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
+import com.openkin.startaiprog.utils.SUMMARY_SIZE
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.zip
 
@@ -49,14 +42,19 @@ class GeminiRepository(
 ) : IGeminiRepository {
 
     override suspend fun askGemini(question: String, chatId: Int) {
-        loadSettings().zip(dataBase.messagesDao.getChatMessages(chatId)) { settings, messages ->
-
+        dataBase.chatsDao.getChatSummary(chatId).zip(loadSettings()) { summary, settings ->
+            Pair(summary, settings)
+        }.zip(dataBase.messagesDao.getChatMessages(chatId)) { summaryWithSettings, messages ->
+            val summary = summaryWithSettings.first
+            val settings = summaryWithSettings.second
+            val outgoingMessageTimeStamp = System.currentTimeMillis()
             val outgoingMessageDbo = MessageDbo(
                 chatId = chatId,
                 message = question,
-                timestamp = System.currentTimeMillis(),
+                timestamp = outgoingMessageTimeStamp,
                 outgoing = true,
                 tokensCount = 0,
+                type = MessageType.COMMON.name.lowercase(),
             )
             dataBase.messagesDao.insert(outgoingMessageDbo)
 
@@ -65,12 +63,18 @@ class GeminiRepository(
             } else {
                 EMPTY_STRING
             }
-            val parts = messages.map {
-                Parts(
-                    role = if(it.outgoing) "user" else "model",
-                    parts = listOf(Part(text = it.message)),
+            val parts: MutableList<Parts> = mutableListOf()
+            if (summary.isNotEmpty()) {
+                parts.add(Parts(role = "model", parts = listOf(Part(text = summary))))
+            }
+            messages.forEach {
+                parts.add(
+                    Parts(
+                        role = if(it.outgoing) "user" else "model",
+                        parts = listOf(Part(text = it.message)),
+                    )
                 )
-            }.toMutableList()
+            }
             parts.add(Parts(role = "user", parts = listOf(Part(text = question))))
             val requestBody = TextGenerateRequest(
                 contents = parts,
@@ -109,6 +113,7 @@ class GeminiRepository(
                     timestamp = System.currentTimeMillis(),
                     outgoing = false,
                     tokensCount = candidatesTokenCount ?: 0,
+                    type = MessageType.COMMON.name.lowercase(),
                 )
                 dataBase.messagesDao.insert(incomingMessageDbo)
             } else {
@@ -119,8 +124,9 @@ class GeminiRepository(
                     timestamp = System.currentTimeMillis(),
                     outgoing = false,
                     tokensCount = 0,
+                    type = MessageType.WARNING.name.lowercase(),
                 )
-                dataBase.messagesDao.insert(incomingMessageDbo)
+                dataBase.messagesDao.removeMessage(outgoingMessageTimeStamp)
             }
 
 
@@ -154,65 +160,78 @@ class GeminiRepository(
 //            )
 //            dataBase.messagesDao.insert(incomingMessageDbo)
 
-            checkForSummary(chatId, settings, messages)
+            checkForSummary(chatId, summary, settings, messages)
         }.first()
     }
 
     private suspend fun checkForSummary(
         chatId: Int,
+        summary: String,
         settings: SettingsViewState,
         messages: List<MessageDbo>,
     ) {
-        val messagesCount = dataBase.messagesDao.getSize()
-        if (messagesCount > MESSAGES_COUNT_FOR_SUMMARY) {
-            val parts = messages.map {
-                Parts(
-                    role = if(it.outgoing) "user" else "model",
-                    parts = listOf(Part(text = it.message)),
-                )
-            }.toMutableList()
-            parts.add(Parts(role = "user", parts = listOf(Part(text = REQUEST_MAKE_SUMMARY))))
-            val requestBody = TextGenerateRequest(
-                contents = parts,
-                generationConfig = GenerationConfig(
-                    maxOutputTokens = settings.maxOutputTokens,
-                    temperature = settings.temperature,
-                    topP = settings.topP,
-                    stopSequences = listOf(EMPTY_STRING),
-                    thinkingConfig = ThinkingConfig(
-                        includeThoughts = settings.includeThoughts,
-                        thinkingLevel = settings.thinkingLevel.name.lowercase(),
-                    ),
-                )
-            )
-            val response = geminiApi.generateText(requestBody)
-            if (response.isSuccess) {
-                val message = response.getOrNull()
-                    ?.candidates?.get(0)
-                    ?.content
-                    ?.parts?.get(0)
-                    ?.text ?: EMPTY_STRING
-                val totalTokensCount = response.getOrNull()?.usageMetadata?.totalTokenCount
-                val promptTokenCount = response.getOrNull()?.usageMetadata?.promptTokenCount
-                val candidatesTokenCount = response.getOrNull()?.usageMetadata?.candidatesTokenCount
+        val messagesCount = messages.filter { it.type == MessageType.COMMON.name.lowercase() }.size
+        if (messagesCount <= MESSAGES_COUNT_FOR_SUMMARY) return
 
-                dataBase.chatsDao.updateTotalTokens(
-                    chatId = chatId,
-                    totalTokens = totalTokensCount ?: 0,
-                )
+        val parts: MutableList<Parts> = mutableListOf()
+        if (summary.isNotEmpty()) {
+            parts.add(Parts(role = "model", parts = listOf(Part(text = summary))))
+        }
 
-                promptTokenCount?.let { dataBase.messagesDao.updateLastMessageTokens(it) }
-
-                val incomingMessageDbo = MessageDbo(
-                    chatId = chatId,
-                    message = message,
-                    timestamp = System.currentTimeMillis(),
-                    outgoing = false,
-                    tokensCount = candidatesTokenCount ?: 0,
+        val messagesToSummary = messages
+            .filter { it.type == MessageType.COMMON.name.lowercase() }
+            .take(SUMMARY_SIZE)
+        messagesToSummary
+            .forEach {
+                parts.add(
+                    Parts(
+                        role = if(it.outgoing) "user" else "model",
+                        parts = listOf(Part(text = it.message)),
+                    )
                 )
-//                dataBase.messagesDao.insert(incomingMessageDbo)
-                dataBase.chatsDao.updateChatSummary(chatId, message)
             }
+        parts.add(Parts(role = "user", parts = listOf(Part(text = REQUEST_MAKE_SUMMARY))))
+
+        val requestBody = TextGenerateRequest(
+            contents = parts,
+            generationConfig = GenerationConfig(
+                maxOutputTokens = settings.maxOutputTokens,
+                temperature = settings.temperature,
+                topP = settings.topP,
+                stopSequences = listOf(EMPTY_STRING),
+                thinkingConfig = ThinkingConfig(
+                    includeThoughts = settings.includeThoughts,
+                    thinkingLevel = settings.thinkingLevel.name.lowercase(),
+                ),
+            )
+        )
+        val response = geminiApi.generateText(requestBody)
+        if (response.isSuccess) {
+            val message = response.getOrNull()
+                ?.candidates?.get(0)
+                ?.content
+                ?.parts?.get(0)
+                ?.text ?: EMPTY_STRING
+            val totalTokensCount = response.getOrNull()?.usageMetadata?.totalTokenCount
+            val candidatesTokenCount = response.getOrNull()?.usageMetadata?.candidatesTokenCount
+
+            dataBase.chatsDao.updateTotalTokens(
+                chatId = chatId,
+                totalTokens = totalTokensCount ?: 0,
+            )
+
+            dataBase.messagesDao.removeMessagesFromFirstTo(messagesToSummary.last().messageId)
+
+            val incomingMessageDbo = MessageDbo(
+                chatId = chatId,
+                message = "Суммаризация сообщений: $SUMMARY_SIZE",
+                timestamp = System.currentTimeMillis(),
+                outgoing = false,
+                tokensCount = candidatesTokenCount ?: 0,
+                type = MessageType.WARNING.name.lowercase(),
+            )
+            dataBase.messagesDao.insert(incomingMessageDbo)
+            dataBase.chatsDao.updateChatSummary(chatId, message)
         }
     }
 

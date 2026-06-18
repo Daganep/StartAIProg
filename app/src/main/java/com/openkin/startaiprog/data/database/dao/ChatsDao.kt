@@ -32,6 +32,9 @@ interface ChatsDao {
     @Query("UPDATE table_chats_database SET chatSummary = :summary WHERE chatId = :chatId")
     suspend fun updateChatSummary(chatId: Int, summary: String)
 
+    @Query("SELECT chatSummary FROM table_chats_database WHERE chatId = :chatId")
+    fun getChatSummary(chatId: Int): Flow<String>
+
     @Query("DELETE FROM table_chats_database WHERE chatId = :chatId")
     suspend fun remove(chatId: Int)
 }

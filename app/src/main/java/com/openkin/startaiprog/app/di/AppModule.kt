@@ -10,6 +10,8 @@ import com.openkin.startaiprog.data.network.GeminiApi
 import com.openkin.startaiprog.data.repository.ChatRepository
 import com.openkin.startaiprog.data.repository.GeminiRepository
 import com.openkin.startaiprog.data.repository.SettingsRepository
+import com.openkin.startaiprog.domain.ChatInteractor
+import com.openkin.startaiprog.domain.IChatInteractor
 import com.openkin.startaiprog.domain.IChatRepository
 import com.openkin.startaiprog.domain.IGeminiRepository
 import com.openkin.startaiprog.domain.ISettingsRepository
@@ -41,6 +43,8 @@ val appModule = module {
     single<ISettingsRepository> { SettingsRepository(settingsDataStore = get()) }
 
     single<IChatRepository> { ChatRepository(dataBase = get()) }
+
+    single<IChatInteractor> { ChatInteractor(chatRepository = get()) }
 
     single<DataStore<Preferences>>() { androidApplication().SettingsDataStore }
 

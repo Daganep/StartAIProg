@@ -9,6 +9,7 @@ const val EMPTY_STRING = ""
 const val SINGLE_LINE = 1
 const val WEIGHT_OF_HALF = 0.5F
 
+const val SUMMARY_SIZE = 6
 const val MESSAGES_COUNT_FOR_SUMMARY = 10
 const val REQUEST_MAKE_SUMMARY = "make summary for all history"
 

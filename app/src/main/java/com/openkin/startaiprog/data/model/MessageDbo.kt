@@ -12,4 +12,5 @@ data class MessageDbo(
     @ColumnInfo("timestamp") val timestamp: Long,
     @ColumnInfo("outgoing") val outgoing: Boolean,
     @ColumnInfo("tokensCount") val tokensCount: Int,
+    @ColumnInfo("type") val type: String,
 )

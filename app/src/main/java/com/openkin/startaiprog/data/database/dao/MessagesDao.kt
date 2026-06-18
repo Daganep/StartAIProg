@@ -22,4 +22,10 @@ interface MessagesDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(message: MessageDbo)
+
+    @Query("DELETE FROM table_messages_database WHERE timeStamp = :timeStamp")
+    suspend fun removeMessage(timeStamp: Long)
+
+    @Query("DELETE FROM table_messages_database WHERE messageId <= :messageId")
+    suspend fun removeMessagesFromFirstTo(messageId: Int)
 }

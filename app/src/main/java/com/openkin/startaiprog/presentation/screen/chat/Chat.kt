@@ -21,9 +21,11 @@ import com.openkin.startaiprog.app.navigation.IAppRouting
 import com.openkin.startaiprog.presentation.screen.mainscreen.widgets.SendTextField
 import org.koin.androidx.compose.koinViewModel
 import androidx.compose.runtime.LaunchedEffect
+import com.openkin.startaiprog.domain.model.MessageType
 import com.openkin.startaiprog.presentation.screen.chat.widgets.ChatTopAppBar
 import com.openkin.startaiprog.presentation.screen.chat.widgets.IncomingMessageUI
 import com.openkin.startaiprog.presentation.screen.chat.widgets.OutgoingMessageUI
+import com.openkin.startaiprog.presentation.screen.chat.widgets.WarningMessageUI
 
 @Composable
 fun Chat(
@@ -75,7 +77,9 @@ fun Chat(
         ) {
             items(items = state.messages, key = { it.messageId }) { item ->
                 val tokensCount = if (state.showTokens) item.tokensCount else 0
-                if (item.outgoing) {
+                if (item.type == MessageType.WARNING) {
+                    WarningMessageUI(item.message)
+                } else if (item.outgoing) {
                     OutgoingMessageUI(item.message, tokensCount, Modifier.align(Alignment.End))
                 } else {
                     IncomingMessageUI(message = item.message, tokensCount = tokensCount)

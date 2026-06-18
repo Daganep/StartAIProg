@@ -2,17 +2,21 @@ package com.openkin.startaiprog.data.repository
 
 import com.openkin.startaiprog.data.database.ChatsDatabase
 import com.openkin.startaiprog.data.model.ChatDbo
-import com.openkin.startaiprog.data.model.MessageDbo
 import com.openkin.startaiprog.domain.IChatRepository
+import com.openkin.startaiprog.domain.model.MessageDto
 import com.openkin.startaiprog.utils.EMPTY_STRING
+import com.openkin.startaiprog.domain.mapper.messageDboToDto
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class ChatRepository(
     private val dataBase: ChatsDatabase,
 ) : IChatRepository {
 
-    override suspend fun loadMessages(chatId: Int): Flow<List<MessageDbo>> =
-        dataBase.messagesDao.getChatMessages(chatId)
+    override suspend fun loadMessages(chatId: Int): Flow<List<MessageDto>> =
+        dataBase.messagesDao.getChatMessages(chatId).map { messagesDbo ->
+            messagesDbo.map { messageDboToDto(it) }
+        }
 
     override suspend fun loadChats(): Flow<List<ChatDbo>> {
         return dataBase.chatsDao.getAll()
