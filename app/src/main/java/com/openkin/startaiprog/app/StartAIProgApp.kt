@@ -1,8 +1,8 @@
 package com.openkin.startaiprog.app
 
 import android.app.Application
-import com.openkin.startaiprog.di.appModule
-import com.openkin.startaiprog.di.viewModelModule
+import com.openkin.startaiprog.app.di.appModule
+import com.openkin.startaiprog.app.di.viewModelModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
